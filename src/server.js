@@ -1,5 +1,4 @@
 const express = require('express');
-const axios = require('axios');
 const path = require('path');
 
 const app = express();
@@ -7,9 +6,12 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 
-// Mock weather data (simulating an API)
+// Serve static files - CORRECTED PATH
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// Mock weather data
 const weatherData = {
   'mumbai': { temp: 32, condition: 'Sunny', humidity: 65, wind: 12, icon: '☀️' },
   'delhi': { temp: 28, condition: 'Cloudy', humidity: 70, wind: 8, icon: '☁️' },
@@ -35,7 +37,7 @@ app.get('/api/weather/:city', (req, res) => {
   } else {
     res.status(404).json({
       success: false,
-      message: 'City not found. Try: Mumbai, Delhi, Bangalore, Chennai, Kolkata, Hyderabad, Pune, or Ahmedabad'
+      message: 'City not found'
     });
   }
 });
@@ -67,4 +69,5 @@ app.get('/api/health', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌍 Weather Dashboard running on port ${PORT}`);
   console.log(`📍 Access at http://localhost:${PORT}`);
+  console.log(`📁 Serving static files from: ${path.join(__dirname, '..', 'public')}`);
 });
