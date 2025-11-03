@@ -3,52 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard - Docker Demo</title>
+    <title>Weather Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="background-animation"></div>
+    
     <div class="container">
         <header>
-            <h1>🌍 Weather Dashboard</h1>
-            <p class="subtitle">Docker Containerization Demo</p>
+            <div class="header-content">
+                <h1>🌤️ Weather Dashboard</h1>
+                <p class="tagline">Real-time weather information for major cities</p>
+            </div>
         </header>
 
-        <div class="search-section">
-            <input type="text" id="cityInput" placeholder="Enter city name (e.g., Mumbai, Delhi, Bangalore)">
-            <button id="searchBtn">Get Weather</button>
+        <div class="cities-grid" id="citiesGrid">
+            <!-- City cards will be dynamically inserted here -->
         </div>
 
-        <div id="weatherCard" class="weather-card hidden">
-            <div class="weather-icon" id="weatherIcon">☀️</div>
-            <h2 id="cityName">City Name</h2>
-            <div class="temperature" id="temperature">--°C</div>
-            <div class="condition" id="condition">Loading...</div>
-            
-            <div class="details">
-                <div class="detail-item">
-                    <span class="label">💧 Humidity</span>
-                    <span class="value" id="humidity">--%</span>
-                </div>
-                <div class="detail-item">
-                    <span class="label">💨 Wind Speed</span>
-                    <span class="value" id="wind">-- km/h</span>
-                </div>
-            </div>
-            
-            <div class="timestamp" id="timestamp"></div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading weather data...</p>
         </div>
-
-        <div class="city-grid">
-            <h3>Quick Select Cities</h3>
-            <div id="cityButtons" class="city-buttons"></div>
-        </div>
-
-        <div id="errorMessage" class="error-message hidden"></div>
     </div>
-
-    <footer>
-        <p>Built with Node.js + Express | Containerized with Docker 🐳</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>

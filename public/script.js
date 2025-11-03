@@ -1,102 +1,83 @@
 // Get DOM elements
-const cityInput = document.getElementById('cityInput');
-const searchBtn = document.getElementById('searchBtn');
-const weatherCard = document.getElementById('weatherCard');
-const errorMessage = document.getElementById('errorMessage');
-const cityButtons = document.getElementById('cityButtons');
+const citiesGrid = document.getElementById('citiesGrid');
+const loading = document.getElementById('loading');
 
-// Weather card elements
-const cityName = document.getElementById('cityName');
-const temperature = document.getElementById('temperature');
-const condition = document.getElementById('condition');
-const weatherIcon = document.getElementById('weatherIcon');
-const humidity = document.getElementById('humidity');
-const wind = document.getElementById('wind');
-const timestamp = document.getElementById('timestamp');
-
-// Fetch weather data
-async function getWeather(city) {
+// Fetch and display all cities weather
+async function loadAllCitiesWeather() {
     try {
-        errorMessage.classList.add('hidden');
-        
-        const response = await fetch(`/api/weather/${city}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            displayWeather(data);
-        } else {
-            showError(data.message);
-        }
-    } catch (error) {
-        showError('Failed to fetch weather data. Please try again.');
-    }
-}
+        // Get list of cities
+        const citiesResponse = await fetch('/api/cities');
+        const citiesData = await citiesResponse.json();
 
-// Display weather information
-function displayWeather(data) {
-    cityName.textContent = data.city;
-    temperature.textContent = `${data.data.temp}°C`;
-    condition.textContent = data.data.condition;
-    weatherIcon.textContent = data.data.icon;
-    humidity.textContent = `${data.data.humidity}%`;
-    wind.textContent = `${data.data.wind} km/h`;
-    timestamp.textContent = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
-    
-    weatherCard.classList.remove('hidden');
-}
+        if (citiesData.success) {
+            // Fetch weather for all cities
+            const weatherPromises = citiesData.cities.map(city => 
+                fetch(`/api/weather/${city.value}`).then(res => res.json())
+            );
 
-// Show error message
-function showError(message) {
-    errorMessage.textContent = message;
-    errorMessage.classList.remove('hidden');
-    weatherCard.classList.add('hidden');
-    
-    setTimeout(() => {
-        errorMessage.classList.add('hidden');
-    }, 5000);
-}
+            const weatherResults = await Promise.all(weatherPromises);
 
-// Load city buttons
-async function loadCities() {
-    try {
-        const response = await fetch('/api/cities');
-        const data = await response.json();
-        
-        if (data.success) {
-            data.cities.forEach(city => {
-                const button = document.createElement('button');
-                button.className = 'city-btn';
-                button.textContent = city.name;
-                button.onclick = () => getWeather(city.value);
-                cityButtons.appendChild(button);
+            // Hide loading
+            loading.classList.add('hidden');
+
+            // Display weather cards
+            weatherResults.forEach(data => {
+                if (data.success) {
+                    createWeatherCard(data);
+                }
             });
         }
     } catch (error) {
-        console.error('Failed to load cities:', error);
+        console.error('Failed to load weather data:', error);
+        loading.innerHTML = '<p>Failed to load weather data. Please refresh the page.</p>';
     }
 }
 
-// Event listeners
-searchBtn.addEventListener('click', () => {
-    const city = cityInput.value.trim();
-    if (city) {
-        getWeather(city);
-        cityInput.value = '';
-    }
-});
+// Create weather card
+function createWeatherCard(data) {
+    const card = document.createElement('div');
+    card.className = 'weather-card';
+    
+    const updateTime = new Date(data.timestamp).toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-cityInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        const city = cityInput.value.trim();
-        if (city) {
-            getWeather(city);
-            cityInput.value = '';
-        }
-    }
-});
+    card.innerHTML = `
+        <div class="card-header">
+            <h2 class="city-name">${data.city}</h2>
+            <div class="weather-icon">${data.data.icon}</div>
+        </div>
+        
+        <div class="temperature-section">
+            <div class="temperature">${data.data.temp}°C</div>
+            <div class="condition">${data.data.condition}</div>
+        </div>
+        
+        <div class="weather-details">
+            <div class="detail-box">
+                <span class="detail-icon">💧</span>
+                <span class="detail-label">Humidity</span>
+                <span class="detail-value">${data.data.humidity}%</span>
+            </div>
+            <div class="detail-box">
+                <span class="detail-icon">💨</span>
+                <span class="detail-label">Wind Speed</span>
+                <span class="detail-value">${data.data.wind} km/h</span>
+            </div>
+        </div>
+        
+        <div class="timestamp">Updated: ${updateTime}</div>
+    `;
 
-// Load cities on page load
-loadCities();
+    citiesGrid.appendChild(card);
+}
 
-// Load default city
-getWeather('mumbai');
+// Load weather data on page load
+loadAllCitiesWeather();
+
+// Optional: Auto-refresh every 5 minutes
+setInterval(() => {
+    citiesGrid.innerHTML = '';
+    loadAllCitiesWeather();
+}, 300000);
