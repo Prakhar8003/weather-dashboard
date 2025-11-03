@@ -7,22 +7,55 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="background-animation"></div>
+    <!-- Animated particles background -->
+    <div class="particles-container" id="particles"></div>
     
     <div class="container">
         <header>
             <div class="header-content">
-                <h1>🌤️ Weather Dashboard</h1>
-                <p class="tagline">Real-time weather information for major cities</p>
+                <div class="logo-section">
+                    <div class="logo-icon">🌍</div>
+                    <div>
+                        <h1>Weather Dashboard</h1>
+                        <p class="tagline">Live weather updates from around India</p>
+                    </div>
+                </div>
+                <div class="time-display" id="currentTime"></div>
             </div>
         </header>
 
-        <div class="cities-grid" id="citiesGrid">
-            <!-- City cards will be dynamically inserted here -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon">🏙️</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="cityCount">8</div>
+                    <div class="stat-label">Cities</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">🌡️</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="avgTemp">--</div>
+                    <div class="stat-label">Avg Temp</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-info">
+                    <div class="stat-value">Live</div>
+                    <div class="stat-label">Status</div>
+                </div>
+            </div>
         </div>
 
+        <div class="cities-grid" id="citiesGrid"></div>
+
         <div class="loading" id="loading">
-            <div class="spinner"></div>
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
             <p>Loading weather data...</p>
         </div>
     </div>
